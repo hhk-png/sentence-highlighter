@@ -1,0 +1,28 @@
+{
+  "name": "text-highlighter",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "fix": "eslint . --fix --cache",
+    "lint": "eslint . --cache",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "release": "bumpp",
+    "prepare": "simple-git-hooks"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.16.2",
+    "lint-staged": "^16.1.2",
+    "simple-git-hooks": "^2.13.0",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.0"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint . --fix --cache"
+  }
+}
