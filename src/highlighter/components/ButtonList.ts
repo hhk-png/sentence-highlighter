@@ -29,7 +29,7 @@ export class ButtonList extends HTMLElement {
   public addButton(button: ButtonItem): void {
     const buttonElement = document.createElement('base-button') as BaseButton
     buttonElement.setAttribute('label', button.label)
-    button.onClick && buttonElement.addClickEvent(button.onClick)
+    button.onClick && buttonElement.addEventListener('click', button.onClick)
     this.container.appendChild(buttonElement)
   }
 }

@@ -44,11 +44,32 @@ export function buildHighlightButtons(buttons: ButtonItem[]) {
   }
 }
 
-export function buildUnHighlightButtons(buttons: ButtonItem[]) {
-  const buildList = buildButtonList(buttons)
-  document.body.appendChild(buildList)
+// TODO: refactor
+export function createUnhighlightButtons(buttons: ButtonItem[]) {
+  const buttonList = buildButtonList(buttons)
 
-  return () => {
-    document.body.removeChild(buildList)
+  document.body.appendChild(buttonList)
+
+  return {
+    instance: buttonList,
+    remove() {
+      document.body.removeChild(buttonList)
+    },
+    // hide() {
+    //   buttonList.style.display = 'none'
+    // },
+    // show() {
+    //   buttonList.style.display = 'block'
+    // },
+    setPosition(position: ListPosition) {
+      buttonList.style.top = `${position.top}px`
+      buttonList.style.left = `${position.left}px`
+      if (position.right) {
+        buttonList.style.right = `${position.right}px`
+      }
+      if (position.bottom) {
+        buttonList.style.bottom = `${position.bottom}px`
+      }
+    },
   }
 }
