@@ -1,24 +1,27 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
+import { TextHighlighter } from './highlighter/highlighter'
+
+// eslint-disable-next-line no-new
+new TextHighlighter()
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
+  <article>
+    <p>
+      Maxime debitis hic, delectus perspiciatis laborum molestiae labore,
+      deleniti, <strong>quam</strong> consequatur <i>iure</i> veniam alias voluptas nisi quo. Dolorem
+      eaque alias, quo vel quas repudiandae architecto deserunt quidem, sapiente
+      laudantium nulla.
     </p>
-  </div>
-`
-
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+    <p>
+      Maiores odit molestias, <b>necessitatibus doloremque <i>dolor illum reprehenderit
+      provident</i> nostrum <span>laboriosam<span> iste, tempore perferendis!</b> Ab porro neque esse
+      voluptas libero necessitatibus fugiat, ex, minus atque deserunt veniam
+      molestiae tempora? Vitae.
+    </p>
+    <p>
+      Dolorum facilis voluptate eaque eius similique ducimus dignissimos assumenda
+      quos architecto. <em>Doloremque deleniti non exercitationem rerum quam alias
+      harum, nisi obcaecati corporis temporibus</em> vero sapiente voluptatum est
+      quibusdam id ipsa.
+    </p>
+  </article>
+`.repeat(5)
