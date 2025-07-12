@@ -1,20 +1,21 @@
-import type { HighlighterOptions } from './types'
+import type { HighlighterOptions, SerializedResult } from './types'
 import { BaseButton } from './components/BaseButton'
 import { buildHighlightButtons, createUnhighlightButtons } from './components/buildButtonList'
 import { ButtonList } from './components/ButtonList'
 import { highlightName } from './constant'
-import { getRangeHeadRect } from './utils'
+import { getElementByXPath, getElementXPath, getRangeHeadRect } from './utils'
 
 export class TextHighlighter {
   private highlighter: Highlight
   // the default mounted element is document.body
-  private mountedElement: HTMLElement
+  private mountedElement: HTMLElement | Document = document
   // <style> for ::highlight
   private highlighterStyle: HTMLStyleElement
   // highlight buttons
   private highlightButtons: ReturnType<typeof buildHighlightButtons>
   private unhighlightButton: ReturnType<typeof createUnhighlightButtons> | undefined = undefined
 
+  // TODO: support a feature that allows users to highlight text in iframes
   constructor(options: Partial<HighlighterOptions> = {}) {
     // define Button components
     customElements.define('base-button', BaseButton)
@@ -37,11 +38,8 @@ export class TextHighlighter {
     ])
     this.highlightButtons.hide()
 
-    if (options.mountedId) {
-      this.mountedElement = document.getElementById(options.mountedId) as HTMLElement
-    }
-    else {
-      this.mountedElement = document.body
+    if (options.mountedElementId) {
+      this.mountedElement = document.getElementById(options.mountedElementId) as HTMLElement
     }
 
     // highlight
@@ -136,6 +134,7 @@ export class TextHighlighter {
         },
       },
     ])
+    // TODO: limit the position boundary of unhighlightButton
     const rangeRect = getRangeHeadRect(currentRange)
     this.unhighlightButton.setPosition({
       top: rangeRect.top - 40,
@@ -143,7 +142,7 @@ export class TextHighlighter {
     })
   }
 
-  private bindedOnClickRange = this.onClickRange.bind(this)
+  private bindedOnClickRange = this.onClickRange.bind(this) as EventListenerOrEventListenerObject
 
   private addOnLoadEvents(): void {
     document.addEventListener('mousedown', this.bindedOnSelectionMouseDown, false)
@@ -153,12 +152,37 @@ export class TextHighlighter {
     this.mountedElement.addEventListener('click', this.bindedOnClickRange, false)
   }
 
-  // later:
   public serialize() {
-    throw new Error('Method not implemented.')
+    const res: SerializedResult = []
+    for (const range of this.highlighter) {
+      if (range instanceof Range && !range.collapsed) {
+        const startContainer = getElementXPath(range.startContainer as HTMLElement)
+        const endContainer = getElementXPath(range.endContainer as HTMLElement)
+        res.push({
+          startContainer,
+          startOffset: range.startOffset,
+          endContainer,
+          endOffset: range.endOffset,
+        })
+      }
+    }
+    return JSON.stringify(res)
   }
 
-  public deserialize() {
-    throw new Error('Method not implemented.')
+  public deserialize(serialized: string, clearPreviousRange: boolean = false): void {
+    const ranges: SerializedResult = JSON.parse(serialized)
+    if (clearPreviousRange) {
+      this.highlighter.clear()
+    }
+    for (const range of ranges) {
+      const startContainer = getElementByXPath(range.startContainer, document)
+      const endContainer = getElementByXPath(range.endContainer, document)
+      if (startContainer && endContainer) {
+        const newRange = document.createRange()
+        newRange.setStart(startContainer, range.startOffset)
+        newRange.setEnd(endContainer, range.endOffset)
+        this.highlighter.add(newRange)
+      }
+    }
   }
 }
