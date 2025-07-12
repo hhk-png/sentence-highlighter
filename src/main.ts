@@ -1,7 +1,7 @@
 import { TextHighlighter } from './highlighter/highlighter'
 
 const highlighter = new TextHighlighter({
-  // mountedElementId: 'temp'
+  mountedElementId: 'app',
 })
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `

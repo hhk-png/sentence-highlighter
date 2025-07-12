@@ -28,7 +28,7 @@ export function getRangeHeadRect(range: Range): DOMRect {
 //   return undefined
 // }
 
-export function getElementXPath(node: HTMLElement, mountedElement: Document | HTMLElement = document): string {
+export function getElementXPath(node: HTMLElement, mountedElement: Document | HTMLElement): string {
   const path: string[] = []
 
   while (node && node !== mountedElement) {
@@ -37,11 +37,11 @@ export function getElementXPath(node: HTMLElement, mountedElement: Document | HT
 
     if (node.nodeType === Node.ELEMENT_NODE) {
       // if the node has an ID, use it directly
-      if (node.id) {
-        segment = `/*[@id="${node.id}"]`
-        path.unshift(segment)
-        break
-      }
+      // if (node.id) {
+      //   segment = `/*[@id="${node.id}"]`
+      //   path.unshift(segment)
+      //   break
+      // }
       const tagName = (node as Element).tagName.toLowerCase()
       let sibling = node.previousElementSibling
       while (sibling) {
@@ -69,6 +69,10 @@ export function getElementXPath(node: HTMLElement, mountedElement: Document | HT
 
     path.unshift(segment)
     node = node.parentNode as HTMLElement
+  }
+
+  if (mountedElement instanceof HTMLElement) {
+    path.unshift(`/*[@id="${mountedElement.id}"]`)
   }
 
   return `/${path.join('/')}`

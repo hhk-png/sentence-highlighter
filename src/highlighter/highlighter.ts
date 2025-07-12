@@ -38,10 +38,6 @@ export class TextHighlighter {
     ])
     this.highlightButtons.hide()
 
-    if (options.mountedElementId) {
-      this.mountedElement = document.getElementById(options.mountedElementId) as HTMLElement
-    }
-
     // highlight
     this.highlighter = new Highlight()
     CSS.highlights.set(highlightName, this.highlighter)
@@ -51,7 +47,17 @@ export class TextHighlighter {
         background-color: #f06;
       }`
     document.head.appendChild(this.highlighterStyle)
-    this.addOnLoadEvents()
+
+    // add events
+    window.addEventListener('load', () => {
+      if (options.mountedElementId) {
+        this.mountedElement = document.getElementById(options.mountedElementId) as HTMLElement
+        if (!this.mountedElement) {
+          throw new Error(`Element with id "${options.mountedElementId}" not found.`)
+        }
+      }
+      this.addOnLoadEvents()
+    })
   }
 
   // avoid memory leak
@@ -156,8 +162,8 @@ export class TextHighlighter {
     const res: SerializedResult = []
     for (const range of this.highlighter) {
       if (range instanceof Range && !range.collapsed) {
-        const startContainer = getElementXPath(range.startContainer as HTMLElement)
-        const endContainer = getElementXPath(range.endContainer as HTMLElement)
+        const startContainer = getElementXPath(range.startContainer as HTMLElement, this.mountedElement)
+        const endContainer = getElementXPath(range.endContainer as HTMLElement, this.mountedElement)
         res.push({
           startContainer,
           startOffset: range.startOffset,
