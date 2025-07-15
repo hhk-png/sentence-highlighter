@@ -10,12 +10,10 @@ export class BaseButton extends HTMLElement {
     this.styleElement = document.createElement('style')
     this.styleElement.textContent = `
       button {
-        padding: 10px 20px;
         font-size: 16px;
         border: none;
-        border-radius: 6px;
-        background-color: #4CAF50;
         color: white;
+        background-color: inherit;
         cursor: pointer;
       }`
 

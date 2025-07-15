@@ -13,9 +13,11 @@ export class ButtonList extends HTMLElement {
     this.styleElement = document.createElement('style')
     this.styleElement.textContent = `
       .button-list {
-
+        padding: 10px 13px;
         display: flex;
         gap: 10px;
+        background-color: #4CAF50;
+        border-radius: 6px;
       }`
 
     this.container = document.createElement('div')

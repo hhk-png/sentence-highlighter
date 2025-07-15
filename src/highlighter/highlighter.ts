@@ -4,6 +4,7 @@ import { buildHighlightButtons, buildUnhighlightButtons } from './components/bui
 import { ButtonList } from './components/ButtonList'
 import { highlightName } from './constant'
 import {
+  formatHighlightStyle,
   getElementByXPath,
   getElementXPath,
   getRangeHeadRect,
@@ -57,6 +58,16 @@ export class TextHighlighter {
           selection.removeAllRanges()
         },
       },
+      {
+        label: 'copy',
+        onClick: () => {
+          const text = this.getSelection()?.toString()
+          if (text) {
+            navigator.clipboard.writeText(text!)
+            this.highlightButtons.hide()
+          }
+        },
+      },
     ], this.currDocument)
     this.highlightButtons.hide()
     // unhighlight Button
@@ -70,10 +81,8 @@ export class TextHighlighter {
     this.highlighter = new this.currWindow.Highlight()
     this.CSSHighlights.set(highlightName, this.highlighter)
     this.highlighterStyle = this.currDocument.createElement('style')
-    this.highlighterStyle.textContent = `
-      ::highlight(${highlightName}) {
-        background-color: #f06;
-      }`
+    this.highlighterStyle.textContent
+      = `::highlight(${highlightName}){${formatHighlightStyle(options.highlightStyle)}}`
     this.currDocument.head.appendChild(this.highlighterStyle)
 
     // add events
@@ -109,7 +118,6 @@ export class TextHighlighter {
     }
 
     // click outside unhighlightButton
-    // TODO: delete button will cause flash when clicking on the same range
     if (!this.unhighlightButton.instance.contains(e.target as HTMLElement)) {
       this.unhighlightButton.hide()
     }
@@ -127,7 +135,7 @@ export class TextHighlighter {
     // set position of the highlight buttons
     const rangeRect = getRangeHeadRect(selection.getRangeAt(0))
     this.highlightButtons.setPosition({
-      top: rangeRect.top - 40,
+      top: rangeRect.top - 45,
       left: rangeRect.left,
     })
   }
@@ -173,7 +181,7 @@ export class TextHighlighter {
 
     const rangeRect = getRangeHeadRect(currentRange)
     this.unhighlightButton.setPosition({
-      top: rangeRect.top - 40,
+      top: rangeRect.top - 45,
       left: rangeRect.left,
     })
   }
