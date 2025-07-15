@@ -9,6 +9,7 @@ export interface SerializedRange {
   startOffset: number
   endContainer: string
   endOffset: number
+  text?: string
 }
 
 export type SerializedResult = SerializedRange[]

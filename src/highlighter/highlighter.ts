@@ -1,4 +1,4 @@
-import type { HighlighterOptions, SerializedResult } from './types'
+import type { HighlighterOptions, SerializedRange, SerializedResult } from './types'
 import { BaseButton } from './components/BaseButton'
 import { buildHighlightButtons, createUnhighlightButtons } from './components/buildButtonList'
 import { ButtonList } from './components/ButtonList'
@@ -189,18 +189,22 @@ export class TextHighlighter {
     this.mountedElement.addEventListener('click', this.bindedOnClickRange, false)
   }
 
-  public serialize() {
+  public serialize(saveText: boolean = false) {
     const res: SerializedResult = []
     for (const range of this.highlighter) {
       if (range instanceof this.RangeClass && !range.collapsed) {
         const startContainer = getElementXPath(range.startContainer as HTMLElement, this.mountedElement)
         const endContainer = getElementXPath(range.endContainer as HTMLElement, this.mountedElement)
-        res.push({
+        const obj: SerializedRange = {
           startContainer,
           startOffset: range.startOffset,
           endContainer,
           endOffset: range.endOffset,
-        })
+        }
+        if (saveText) {
+          obj.text = range.toString()
+        }
+        res.push(obj)
       }
     }
     return JSON.stringify(res)

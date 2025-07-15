@@ -4,30 +4,6 @@ export function getRangeHeadRect(range: Range): DOMRect {
   return clonedRange.getBoundingClientRect()
 }
 
-// export function getIframeElementFromDocument(win: Window): HTMLIFrameElement | undefined {
-//   const parentWin = win.parent
-
-//   if (win === parentWin) {
-//     // window.parent === window, meaning it's not inside an iframe
-//     return undefined
-//   }
-
-//   const iframes = parentWin.document.getElementsByTagName('iframe')
-
-//   for (let iframe of iframes) {
-//     try {
-//       if (iframe.contentWindow === win) {
-//         return iframe
-//       }
-//     } catch (e) {
-//       console.warn('Cross-domain iframe, unable to access contentWindow.')
-//       return undefined
-//     }
-//   }
-
-//   return undefined
-// }
-
 export function getElementXPath(node: HTMLElement, mountedElement: Document | HTMLElement): string {
   const path: string[] = []
 
@@ -77,23 +53,6 @@ export function getElementXPath(node: HTMLElement, mountedElement: Document | HT
 
   return `/${path.join('/')}`
 }
-
-// export function getElementXPath(elem: HTMLElement): string[] {
-//   const res: string[] = []
-//   let win: Window | null = null
-//   while (win !== window) {
-//     const [elemWindow, xpath] = getSegmentXPath(elem)
-//     res.unshift(xpath)
-//     const iframe = getIframeElementFromDocument(elemWindow!)
-
-//     if (!iframe) {
-//       break
-//     } else {
-//       win = elemWindow
-//     }
-//   }
-//   return res
-// }
 
 export function getElementByXPath(xpath: string, doc: Document): HTMLElement {
   return doc.evaluate(xpath, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLElement

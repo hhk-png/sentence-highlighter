@@ -48,7 +48,7 @@ const iframeHighlighter = new TextHighlighter({
 })
 let serialized2 = ''
 iframe.contentDocument!.getElementById('serialize')!.addEventListener('click', () => {
-  serialized2 = iframeHighlighter.serialize()
+  serialized2 = iframeHighlighter.serialize(true)
 })
 
 iframe.contentDocument!.getElementById('deserialize')!.addEventListener('click', () => {
