@@ -3,23 +3,46 @@ import { BaseButton } from './components/BaseButton'
 import { buildHighlightButtons, createUnhighlightButtons } from './components/buildButtonList'
 import { ButtonList } from './components/ButtonList'
 import { highlightName } from './constant'
-import { getElementByXPath, getElementXPath, getRangeHeadRect } from './utils'
+import {
+  getElementByXPath,
+  getElementXPath,
+  getRangeHeadRect,
+} from './utils'
 
 export class TextHighlighter {
   private highlighter: Highlight
   // the default mounted element is document.body
-  private mountedElement: HTMLElement | Document = document
+  private mountedElement!: HTMLElement | Document
   // <style> for ::highlight
   private highlighterStyle: HTMLStyleElement
   // highlight buttons
   private highlightButtons: ReturnType<typeof buildHighlightButtons>
   private unhighlightButton: ReturnType<typeof createUnhighlightButtons> | undefined = undefined
 
-  // TODO: support a feature that allows users to highlight text in iframes
+  private currWindow: typeof globalThis = window
+  private currDocument: Document = document
+
+  private RangeClass!: typeof Range
+  private CSSHighlights!: HighlightRegistry
+
+  private defineCustomComponents() {
+    this.currWindow.customElements.define('base-button', BaseButton)
+    this.currWindow.customElements.define('button-list', ButtonList)
+  }
+
+  private getSelection(): Selection | null {
+    return this.currWindow.getSelection()
+  }
+
   constructor(options: Partial<HighlighterOptions> = {}) {
+    if (options.document) {
+      this.currDocument = options.document
+      this.currWindow = options.document.defaultView!
+    }
+    this.CSSHighlights = this.currWindow.CSS.highlights
+    this.RangeClass = this.currWindow.Range
     // define Button components
-    customElements.define('base-button', BaseButton)
-    customElements.define('button-list', ButtonList)
+    this.defineCustomComponents()
 
     // highlightButtons
     this.highlightButtons = buildHighlightButtons([
@@ -27,34 +50,37 @@ export class TextHighlighter {
         label: 'highlight',
         onClick: (e) => {
           e.stopPropagation()
-          const selection = window.getSelection()!
+          const selection = this.getSelection()!
           const range = selection.getRangeAt(0)
-
           this.highlighter.add(range)
           this.highlightButtons.hide()
           selection.removeAllRanges()
         },
       },
-    ])
+    ], this.currDocument)
     this.highlightButtons.hide()
 
     // highlight
-    this.highlighter = new Highlight()
-    CSS.highlights.set(highlightName, this.highlighter)
-    this.highlighterStyle = document.createElement('style')
+    this.highlighter = new this.currWindow.Highlight()
+    this.CSSHighlights.set(highlightName, this.highlighter)
+    this.highlighterStyle = this.currDocument.createElement('style')
     this.highlighterStyle.textContent = `
       ::highlight(${highlightName}) {
         background-color: #f06;
       }`
-    document.head.appendChild(this.highlighterStyle)
+    this.currDocument.head.appendChild(this.highlighterStyle)
 
     // add events
-    window.addEventListener('load', () => {
+    this.currWindow.addEventListener('load', () => {
       if (options.mountedElementId) {
-        this.mountedElement = document.getElementById(options.mountedElementId) as HTMLElement
+        this.mountedElement
+          = this.currDocument.getElementById(options.mountedElementId) as HTMLElement
         if (!this.mountedElement) {
-          throw new Error(`Element with id "${options.mountedElementId}" not found.`)
+          throw new Error(`Element with id "${options.mountedElementId}" not found. So it can not work.`)
         }
+      }
+      else {
+        this.mountedElement = this.currDocument
       }
       this.addOnLoadEvents()
     })
@@ -63,16 +89,16 @@ export class TextHighlighter {
   // avoid memory leak
   destroy(): void {
     this.mountedElement.removeEventListener('click', this.bindedOnClickRange)
-    document.removeEventListener('mousedown', this.bindedOnSelectionMouseDown)
-    document.removeEventListener('mouseup', this.bindedOnSelectionMouseUp)
+    this.currDocument.removeEventListener('mousedown', this.bindedOnSelectionMouseDown)
+    this.currDocument.removeEventListener('mouseup', this.bindedOnSelectionMouseUp)
     this.highlighterStyle.remove()
-    CSS.highlights.delete(highlightName)
+    this.CSSHighlights.delete(highlightName)
   }
 
   private onSelectionMouseDown(e: MouseEvent): void {
     // click outside highlightButtons
     if (!this.highlightButtons.instance.contains(e.target as HTMLElement)) {
-      window.getSelection()?.removeAllRanges()
+      this.getSelection()?.removeAllRanges()
       this.highlightButtons.hide()
     }
 
@@ -87,7 +113,7 @@ export class TextHighlighter {
   private bindedOnSelectionMouseDown = this.onSelectionMouseDown.bind(this)
 
   private onSelectionMouseUp(_: MouseEvent): void {
-    const selection = window.getSelection()
+    const selection = this.getSelection()
     if (!selection || selection.isCollapsed)
       return
     // Show `Highlight` button
@@ -105,17 +131,22 @@ export class TextHighlighter {
 
   private onClickRange(e: MouseEvent): void {
     // to avoid delete range when selecting text
-    const selection = window.getSelection()
+    const selection = this.getSelection()
     if (selection && !selection.isCollapsed) {
       return
     }
 
     // collect ranges that intersect with the clicked target
-    const target = e.target as HTMLElement
     const intersectionRanges: Range[] = []
     for (const range of this.highlighter) {
-      if (range instanceof Range && !range.collapsed) {
-        if (range.intersectsNode(target)) {
+      if (range instanceof this.RangeClass && !range.collapsed) {
+        // using getBoundingClientRect to check if the mouse is inside the range's rect
+        const mouseX = e.clientX
+        const mouseY = e.clientY
+        const rect = range.getBoundingClientRect()
+        if (
+          mouseX >= rect.left && mouseX <= rect.right
+          && mouseY >= rect.top && mouseY <= rect.bottom) {
           intersectionRanges.push(range)
           break
         }
@@ -139,8 +170,8 @@ export class TextHighlighter {
           this.unhighlightButton = undefined
         },
       },
-    ])
-    // TODO: limit the position boundary of unhighlightButton
+    ], this.currDocument)
+
     const rangeRect = getRangeHeadRect(currentRange)
     this.unhighlightButton.setPosition({
       top: rangeRect.top - 40,
@@ -151,9 +182,9 @@ export class TextHighlighter {
   private bindedOnClickRange = this.onClickRange.bind(this) as EventListenerOrEventListenerObject
 
   private addOnLoadEvents(): void {
-    document.addEventListener('mousedown', this.bindedOnSelectionMouseDown, false)
+    this.currDocument.addEventListener('mousedown', this.bindedOnSelectionMouseDown, false)
     // Show Highlight button
-    document.addEventListener('mouseup', this.bindedOnSelectionMouseUp, false)
+    this.currDocument.addEventListener('mouseup', this.bindedOnSelectionMouseUp, false)
     // click range to show delete button
     this.mountedElement.addEventListener('click', this.bindedOnClickRange, false)
   }
@@ -161,7 +192,7 @@ export class TextHighlighter {
   public serialize() {
     const res: SerializedResult = []
     for (const range of this.highlighter) {
-      if (range instanceof Range && !range.collapsed) {
+      if (range instanceof this.RangeClass && !range.collapsed) {
         const startContainer = getElementXPath(range.startContainer as HTMLElement, this.mountedElement)
         const endContainer = getElementXPath(range.endContainer as HTMLElement, this.mountedElement)
         res.push({
@@ -181,10 +212,10 @@ export class TextHighlighter {
       this.highlighter.clear()
     }
     for (const range of ranges) {
-      const startContainer = getElementByXPath(range.startContainer, document)
-      const endContainer = getElementByXPath(range.endContainer, document)
+      const startContainer = getElementByXPath(range.startContainer, this.currDocument)
+      const endContainer = getElementByXPath(range.endContainer, this.currDocument)
       if (startContainer && endContainer) {
-        const newRange = document.createRange()
+        const newRange = this.currDocument.createRange()
         newRange.setStart(startContainer, range.startOffset)
         newRange.setEnd(endContainer, range.endOffset)
         this.highlighter.add(newRange)

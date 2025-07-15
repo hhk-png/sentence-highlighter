@@ -16,9 +16,9 @@ interface ListPosition {
   bottom?: number
 }
 
-export function buildHighlightButtons(buttons: ButtonItem[]) {
+export function buildHighlightButtons(buttons: ButtonItem[], doc: Document) {
   const buttonList = buildButtonList(buttons)
-  document.body.appendChild(buttonList)
+  doc.body.appendChild(buttonList)
 
   return {
     instance: buttonList,
@@ -45,15 +45,15 @@ export function buildHighlightButtons(buttons: ButtonItem[]) {
 }
 
 // TODO: refactor
-export function createUnhighlightButtons(buttons: ButtonItem[]) {
+export function createUnhighlightButtons(buttons: ButtonItem[], doc: Document) {
   const buttonList = buildButtonList(buttons)
 
-  document.body.appendChild(buttonList)
+  doc.body.appendChild(buttonList)
 
   return {
     instance: buttonList,
     remove() {
-      document.body.removeChild(buttonList)
+      doc.body.removeChild(buttonList)
     },
     // hide() {
     //   buttonList.style.display = 'none'

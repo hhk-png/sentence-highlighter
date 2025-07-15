@@ -1,5 +1,6 @@
 export interface HighlighterOptions {
   mountedElementId: string
+  document?: Document
 }
 
 export interface SerializedRange {
