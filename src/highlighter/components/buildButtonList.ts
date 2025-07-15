@@ -1,7 +1,7 @@
 import type { ButtonList } from './ButtonList'
 import type { ButtonItem } from './types'
 
-export function buildButtonList(buttons: ButtonItem[]): ButtonList {
+function buildButtonList(buttons: ButtonItem[]): ButtonList {
   const buttonList = document.createElement('button-list') as ButtonList
   for (const button of buttons) {
     buttonList.addButton(button)
@@ -12,8 +12,6 @@ export function buildButtonList(buttons: ButtonItem[]): ButtonList {
 interface ListPosition {
   top: number
   left: number
-  right?: number
-  bottom?: number
 }
 
 export function buildHighlightButtons(buttons: ButtonItem[], doc: Document) {
@@ -34,42 +32,29 @@ export function buildHighlightButtons(buttons: ButtonItem[], doc: Document) {
     setPosition(position: ListPosition) {
       buttonList.style.top = `${position.top}px`
       buttonList.style.left = `${position.left}px`
-      if (position.right) {
-        buttonList.style.right = `${position.right}px`
-      }
-      if (position.bottom) {
-        buttonList.style.bottom = `${position.bottom}px`
-      }
     },
   }
 }
 
-// TODO: refactor
-export function createUnhighlightButtons(buttons: ButtonItem[], doc: Document) {
+export function buildUnhighlightButtons(buttons: ButtonItem[], doc: Document) {
   const buttonList = buildButtonList(buttons)
 
   doc.body.appendChild(buttonList)
 
   return {
     instance: buttonList,
-    remove() {
-      doc.body.removeChild(buttonList)
+    hide() {
+      buttonList.style.display = 'none'
     },
-    // hide() {
-    //   buttonList.style.display = 'none'
-    // },
-    // show() {
-    //   buttonList.style.display = 'block'
-    // },
+    show() {
+      buttonList.style.display = 'block'
+    },
     setPosition(position: ListPosition) {
       buttonList.style.top = `${position.top}px`
       buttonList.style.left = `${position.left}px`
-      if (position.right) {
-        buttonList.style.right = `${position.right}px`
-      }
-      if (position.bottom) {
-        buttonList.style.bottom = `${position.bottom}px`
-      }
+    },
+    rebindEvent(event: (e: MouseEvent) => void) {
+      buttonList.rebindButtonClickEvent('delete', event)
     },
   }
 }

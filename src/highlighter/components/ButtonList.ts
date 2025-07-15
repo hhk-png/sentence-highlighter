@@ -4,6 +4,7 @@ import type { ButtonItem } from './types'
 export class ButtonList extends HTMLElement {
   private styleElement: HTMLStyleElement
   private container: HTMLDivElement
+  private labelToElementMap: Map<string, BaseButton> = new Map()
 
   constructor() {
     super()
@@ -27,9 +28,19 @@ export class ButtonList extends HTMLElement {
   }
 
   public addButton(button: ButtonItem): void {
+    const { label, onClick } = button
     const buttonElement = document.createElement('base-button') as BaseButton
-    buttonElement.setAttribute('label', button.label)
-    button.onClick && buttonElement.addEventListener('click', button.onClick)
+    buttonElement.setAttribute('label', label)
+    if (onClick) {
+      buttonElement.onclick = onClick
+    }
     this.container.appendChild(buttonElement)
+    this.labelToElementMap.set(label, buttonElement)
+  }
+
+  public rebindButtonClickEvent(label: string, event: (e: MouseEvent) => void) {
+    if (this.labelToElementMap.has(label)) {
+      this.labelToElementMap.get(label)!.onclick = event
+    }
   }
 }

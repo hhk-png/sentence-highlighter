@@ -1,6 +1,6 @@
 import type { HighlighterOptions, SerializedRange, SerializedResult } from './types'
 import { BaseButton } from './components/BaseButton'
-import { buildHighlightButtons, createUnhighlightButtons } from './components/buildButtonList'
+import { buildHighlightButtons, buildUnhighlightButtons } from './components/buildButtonList'
 import { ButtonList } from './components/ButtonList'
 import { highlightName } from './constant'
 import {
@@ -17,7 +17,7 @@ export class TextHighlighter {
   private highlighterStyle: HTMLStyleElement
   // highlight buttons
   private highlightButtons: ReturnType<typeof buildHighlightButtons>
-  private unhighlightButton: ReturnType<typeof createUnhighlightButtons> | undefined = undefined
+  private unhighlightButton: ReturnType<typeof buildUnhighlightButtons>
 
   private currWindow: typeof globalThis = window
   private currDocument: Document = document
@@ -44,7 +44,7 @@ export class TextHighlighter {
     // define Button components
     this.defineCustomComponents()
 
-    // highlightButtons
+    // highlight Buttons
     this.highlightButtons = buildHighlightButtons([
       {
         label: 'highlight',
@@ -59,6 +59,12 @@ export class TextHighlighter {
       },
     ], this.currDocument)
     this.highlightButtons.hide()
+    // unhighlight Button
+    this.unhighlightButton = buildUnhighlightButtons([{
+      label: 'delete',
+      onClick: () => { },
+    }], this.currDocument)
+    this.unhighlightButton.hide()
 
     // highlight
     this.highlighter = new this.currWindow.Highlight()
@@ -104,9 +110,8 @@ export class TextHighlighter {
 
     // click outside unhighlightButton
     // TODO: delete button will cause flash when clicking on the same range
-    if (!this.unhighlightButton?.instance.contains(e.target as HTMLElement)) {
-      this.unhighlightButton?.remove()
-      this.unhighlightButton = undefined
+    if (!this.unhighlightButton.instance.contains(e.target as HTMLElement)) {
+      this.unhighlightButton.hide()
     }
   }
 
@@ -158,19 +163,13 @@ export class TextHighlighter {
 
     // remove collected range
     const currentRange = intersectionRanges[0]
-    // we need to recreate the unhighlightButton each click,
-    //  because we need to rebind the click event
-    this.unhighlightButton = createUnhighlightButtons([
-      {
-        label: 'delete',
-        onClick: (e) => {
-          e.stopPropagation()
-          this.highlighter.delete(currentRange)
-          this.unhighlightButton!.remove()
-          this.unhighlightButton = undefined
-        },
-      },
-    ], this.currDocument)
+    // rebind the click event
+    this.unhighlightButton.rebindEvent((e) => {
+      e.stopPropagation()
+      this.highlighter.delete(currentRange)
+      this.unhighlightButton.hide()
+    })
+    this.unhighlightButton.show()
 
     const rangeRect = getRangeHeadRect(currentRange)
     this.unhighlightButton.setPosition({
