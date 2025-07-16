@@ -1,4 +1,4 @@
-import { TextHighlighter } from './highlighter/highlighter'
+import { SentenceHighlighter } from 'sentence-highlighter'
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `${`
 
@@ -27,7 +27,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `${`
 
 }<button id="serialize">serialize</button><button id="deserialize">deserialize</button>`
 
-const highlighter = new TextHighlighter({
+const highlighter = new SentenceHighlighter({
   mountedElementId: 'app',
 })
 
@@ -42,15 +42,19 @@ document.getElementById('deserialize')!.addEventListener('click', () => {
 
 const iframe = document.getElementById('iframe') as HTMLIFrameElement
 
-const iframeHighlighter = new TextHighlighter({
+const iframeHighlighter = new SentenceHighlighter({
   // mountedElementId: 'app',
   document: iframe.contentDocument!,
 })
-let serialized2 = ''
-iframe.contentDocument!.getElementById('serialize')!.addEventListener('click', () => {
-  serialized2 = iframeHighlighter.serialize(true)
-})
 
-iframe.contentDocument!.getElementById('deserialize')!.addEventListener('click', () => {
-  iframeHighlighter.deserialize(serialized2, true)
+iframe.addEventListener('load', () => {
+  let serialized2 = ''
+
+  iframe.contentDocument!.getElementsByTagName('button')[0]!.addEventListener('click', () => {
+    serialized2 = iframeHighlighter.serialize(true)
+  })
+
+  iframe.contentDocument!.getElementById('deserialize')!.addEventListener('click', () => {
+    iframeHighlighter.deserialize(serialized2, true)
+  })
 })

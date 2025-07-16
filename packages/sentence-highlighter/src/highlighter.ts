@@ -15,7 +15,7 @@ import {
   getElementXPath,
 } from './xpath'
 
-export class TextHighlighter {
+export class SentenceHighlighter {
   private highlighter: Highlight
   // the default mounted element is document.body
   private mountedElement!: HTMLElement | Document

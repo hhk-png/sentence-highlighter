@@ -1,4 +1,4 @@
-import type { HighlightStyle } from './types'
+import type { HighlightStyle } from './src/types'
 
 function normalizeKey(key: string) {
   return key.replace(/([A-Z])/g, letter => `-${letter.toLowerCase()}`)
