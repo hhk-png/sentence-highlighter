@@ -10,6 +10,7 @@ export class BaseButton extends HTMLElement {
     this.styleElement = document.createElement('style')
     this.styleElement.textContent = `
       button {
+        padding: 10px 13px;
         font-size: 16px;
         border: none;
         color: white;

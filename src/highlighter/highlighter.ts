@@ -1,14 +1,19 @@
 import type { HighlighterOptions, SerializedRange, SerializedResult } from './types'
 import { BaseButton } from './components/BaseButton'
-import { buildHighlightButtons, buildUnhighlightButtons } from './components/buildButtonList'
+import {
+  buildHighlightButtons,
+  buildUnhighlightButtons,
+} from './components/buildButtonList'
 import { ButtonList } from './components/ButtonList'
 import { highlightName } from './constant'
 import {
   formatHighlightStyle,
-  getElementByXPath,
-  getElementXPath,
   getRangeHeadRect,
 } from './utils'
+import {
+  getElementByXPath,
+  getElementXPath,
+} from './xpath'
 
 export class TextHighlighter {
   private highlighter: Highlight
@@ -65,6 +70,7 @@ export class TextHighlighter {
           if (text) {
             navigator.clipboard.writeText(text!)
             this.highlightButtons.hide()
+            this.getSelection()?.removeAllRanges()
           }
         },
       },
@@ -78,7 +84,7 @@ export class TextHighlighter {
     this.unhighlightButton.hide()
 
     // highlight
-    this.highlighter = new this.currWindow.Highlight()
+    this.highlighter = new globalThis.Highlight()
     this.CSSHighlights.set(highlightName, this.highlighter)
     this.highlighterStyle = this.currDocument.createElement('style')
     this.highlighterStyle.textContent
