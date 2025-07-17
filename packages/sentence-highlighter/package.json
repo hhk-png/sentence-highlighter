@@ -1,10 +1,16 @@
 {
   "name": "sentence-highlighter",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "packageManager": "pnpm@10.7.0",
   "author": "hhk-png <fangluoabc@163.com>",
   "license": "MIT",
+  "homepage": "https://github.com/hhk-png/sentence-highlighter",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:hhk-png/sentence-highlighter.git"
+  },
+  "bugs": "https://github.com/hhk-png/sentence-highlighter/issues",
   "exports": {
     ".": {
       "import": "./dist/highlighter.mjs",
