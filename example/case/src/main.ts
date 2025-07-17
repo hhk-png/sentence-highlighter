@@ -3,7 +3,7 @@ import { SentenceHighlighter } from 'sentence-highlighter'
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `${`
 
   <article>
-    <img src="/vite.svg"/>
+    <img src="/sentence-highlighter/vite.svg"/>
     <p>
       Maxime debitis hic, delectus perspiciatis laborum molestiae labore,
       deleniti, <strong>quam</strong> consequatur <i>iure</i> veniam alias voluptas nisi quo. Dolorem
