@@ -202,7 +202,7 @@ export class SentenceHighlighter {
     this.mountedElement.addEventListener('click', this.bindedOnClickRange, false)
   }
 
-  public serialize(saveText: boolean = false) {
+  public serialize(saveText: boolean = false): SerializedResult {
     const res: SerializedResult = []
     for (const range of this.highlighter) {
       if (range instanceof this.RangeClass && !range.collapsed) {
@@ -220,15 +220,14 @@ export class SentenceHighlighter {
         res.push(obj)
       }
     }
-    return JSON.stringify(res)
+    return res
   }
 
-  public deserialize(serialized: string, clearPreviousRange: boolean = false): void {
-    const ranges: SerializedResult = JSON.parse(serialized)
+  public deserialize(serialized: SerializedResult, clearPreviousRange: boolean = false): void {
     if (clearPreviousRange) {
       this.highlighter.clear()
     }
-    for (const range of ranges) {
+    for (const range of serialized) {
       const startContainer = getElementByXPath(range.startContainer, this.currDocument)
       const endContainer = getElementByXPath(range.endContainer, this.currDocument)
       if (startContainer && endContainer) {

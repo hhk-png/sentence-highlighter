@@ -12,7 +12,6 @@ export interface HighlighterOptions {
 }
 
 export interface SerializedRange {
-  // XPath array
   startContainer: string
   startOffset: number
   endContainer: string
