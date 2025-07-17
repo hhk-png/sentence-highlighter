@@ -84,7 +84,7 @@ export class SentenceHighlighter {
     this.unhighlightButton.hide()
 
     // highlight
-    this.highlighter = new globalThis.Highlight()
+    this.highlighter = new this.currWindow.Highlight()
     this.CSSHighlights.set(highlightName, this.highlighter)
     this.highlighterStyle = this.currDocument.createElement('style')
     this.highlighterStyle.textContent
