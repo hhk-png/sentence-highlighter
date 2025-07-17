@@ -3,6 +3,7 @@ import { SentenceHighlighter } from 'sentence-highlighter'
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `${`
 
   <article>
+    <img src="/vite.svg"/>
     <p>
       Maxime debitis hic, delectus perspiciatis laborum molestiae labore,
       deleniti, <strong>quam</strong> consequatur <i>iure</i> veniam alias voluptas nisi quo. Dolorem
@@ -31,7 +32,7 @@ const highlighter = new SentenceHighlighter({
   mountedElementId: 'app',
 })
 
-let serialized = ''
+let serialized: ReturnType<SentenceHighlighter['serialize']>
 document.getElementById('serialize')!.addEventListener('click', () => {
   serialized = highlighter.serialize()
 })
@@ -40,21 +41,21 @@ document.getElementById('deserialize')!.addEventListener('click', () => {
   highlighter.deserialize(serialized, true)
 })
 
-const iframe = document.getElementById('iframe') as HTMLIFrameElement
+// const iframe = document.getElementById('iframe') as HTMLIFrameElement
 
-const iframeHighlighter = new SentenceHighlighter({
-  // mountedElementId: 'app',
-  document: iframe.contentDocument!,
-})
+// const iframeHighlighter = new SentenceHighlighter({
+//   // mountedElementId: 'app',
+//   document: iframe.contentDocument!,
+// })
 
-iframe.addEventListener('load', () => {
-  let serialized2 = ''
+// iframe.addEventListener('load', () => {
+//   let serialized2: ReturnType<SentenceHighlighter["serialize"]>
 
-  iframe.contentDocument!.getElementsByTagName('button')[0]!.addEventListener('click', () => {
-    serialized2 = iframeHighlighter.serialize(true)
-  })
+//   iframe.contentDocument!.getElementsByTagName('button')[0]!.addEventListener('click', () => {
+//     serialized2 = iframeHighlighter.serialize(true)
+//   })
 
-  iframe.contentDocument!.getElementById('deserialize')!.addEventListener('click', () => {
-    iframeHighlighter.deserialize(serialized2, true)
-  })
-})
+//   iframe.contentDocument!.getElementById('deserialize')!.addEventListener('click', () => {
+//     iframeHighlighter.deserialize(serialized2, true)
+//   })
+// })
