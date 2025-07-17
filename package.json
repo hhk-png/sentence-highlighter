@@ -3,6 +3,9 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
+  "packageManager": "pnpm@10.7.0",
+  "author": "hhk-png <fangluoabc@163.com>",
+  "license": "MIT",
   "scripts": {
     "fix": "eslint . --fix --cache",
     "lint": "eslint . --cache",

@@ -25,37 +25,22 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `${`
       quibusdam id ipsa.
     </p>
   </article>`.repeat(5)
-
-}<button id="serialize">serialize</button><button id="deserialize">deserialize</button>`
+}<button id="serialize">serialize</button><button id="deserialize">deserialize</button>
+<div contenteditable id="showArea" style="margin-top:5px; height: 300px; border:1px solid red;"></div>
+`
 
 const highlighter = new SentenceHighlighter({
   mountedElementId: 'app',
 })
 
 let serialized: ReturnType<SentenceHighlighter['serialize']>
+const showArea = document.getElementById('showArea') as HTMLDivElement
 document.getElementById('serialize')!.addEventListener('click', () => {
   serialized = highlighter.serialize()
+  showArea.innerHTML = JSON.stringify(serialized)
 })
 
 document.getElementById('deserialize')!.addEventListener('click', () => {
   highlighter.deserialize(serialized, true)
+  showArea.innerHTML = ''
 })
-
-// const iframe = document.getElementById('iframe') as HTMLIFrameElement
-
-// const iframeHighlighter = new SentenceHighlighter({
-//   // mountedElementId: 'app',
-//   document: iframe.contentDocument!,
-// })
-
-// iframe.addEventListener('load', () => {
-//   let serialized2: ReturnType<SentenceHighlighter["serialize"]>
-
-//   iframe.contentDocument!.getElementsByTagName('button')[0]!.addEventListener('click', () => {
-//     serialized2 = iframeHighlighter.serialize(true)
-//   })
-
-//   iframe.contentDocument!.getElementById('deserialize')!.addEventListener('click', () => {
-//     iframeHighlighter.deserialize(serialized2, true)
-//   })
-// })
